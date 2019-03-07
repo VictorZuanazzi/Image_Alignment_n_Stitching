@@ -1,7 +1,9 @@
-function [best_x, best_inlier] = RANSAC (inlier_threshold ,num_trials, num_matches, f1, f2, matches)
+function [best_x, best_inlier, first_good] = RANSAC (inlier_threshold ,num_trials, num_matches, f1, f2, matches)
 
 best_x = zeros(6,1);
 best_inlier = -1;
+record = true;
+first_good = num_trials*2;
 for i = 1:num_trials
     [f1_idx, f2_idx, ~] = select_matches(num_matches, matches);
     x1 = f1(1, f1_idx);
@@ -16,6 +18,7 @@ for i = 1:num_trials
     b = [x2'; y2'];
 
     x = pinv(A)*b;
+    
     f1_sel = f1(1:2, f1_idx);
     f2_sel = f2(1:2, f2_idx);
     inlier_c = num_inliers(inlier_threshold, f1_sel, f2_sel, x);
@@ -24,7 +27,10 @@ for i = 1:num_trials
         best_x = x;
         best_inlier = inlier_c;
     end
-    
+    if record && inlier_c >= 3
+        first_good = i;
+        record = false;
+    end
 end
 
 end
