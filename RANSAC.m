@@ -1,4 +1,4 @@
-function [best_x] = RANSAC (inlier_threshold ,num_trials, num_matches, f1, f2, matches)
+function [best_x, best_inlier] = RANSAC (inlier_threshold ,num_trials, num_matches, f1, f2, matches)
 
 best_x = zeros(6,1);
 best_inlier = -1;
