@@ -12,14 +12,26 @@ I2 = imread('boat2.pgm');
 [matches, f1, f2] = keypoint_matching(I1, I2);
 
 %plot the two images showing the descriptors.
-num_matches = 10;
+num_matches = 10; %size(matches, 1); %10;
 connect_KP(I1, I2, f1, f2, matches, num_matches);
 
 %find the best - or just a good one - rotation matrix.
 inlier_threshold = 10;
 num_trials = 100;
-[best_x, best_inlier] = RANSAC(inlier_threshold ,num_trials, num_matches, f1, f2, matches);
+num_experiments = 10;
+first_good = zeros(num_experiments,1);
 
+best_inlier = -1;
+for i = 1:num_experiments
+    [b_x, best_in, first_good(i)] = RANSAC(inlier_threshold ,num_trials, num_matches, f1, f2, matches);
+    if best_in > best_inlier
+        best_inlier = best_in;
+        best_x = b_x;
+    end
+end
+
+figure(42)
+histogram(first_good)
 %reshape best_x to the rotation matrix
 x = reshape(best_x, [2,3]);
 x = [x; 0 0 1];
