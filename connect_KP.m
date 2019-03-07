@@ -1,15 +1,13 @@
-function connect_KP(I1, I2, f1, f2, matches)
+function connect_KP(I1, I2, f1, f2, matches, num_matches)
 % given two images, plot 10 random pairs of matching points.
 %Input:
     %I1, I2, the two images 
     %f1, f2 are the sift coordinates (x, y, S, theta) descriptors from both images
     %matches: matrix with the indexes of the matching descriptors
 
-k = 10;
-selection = randperm(size(matches, 2), k) ;
-f1_sel = matches(1,selection); 
-f2_sel = matches(2, selection);
-figure(1);
+[~, ~, selection] = select_matches(num_matches, matches);
+
+fig = figure(1);
 clf;
 
 imshow([I1, I2]);
