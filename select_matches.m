@@ -1,6 +1,11 @@
-function [f1_sel, f2_sel, selection] = select_matches(num_matches, matches);
+function [selection] = select_matches(num_matches, matches)
+% Selects random matches.
+% Inputs: 
+    % num_matches: Number of random matches being selected.
+    % matches: Matches being selected from.
+% Outputs: 
+    % selection: Random subset of matches.
+    
+selection = randperm(size(matches, 2), num_matches);
 
-selection = randperm(size(matches, 2), num_matches) ;
-f1_sel = matches(1,selection); 
-f2_sel = matches(2,selection);
 end
