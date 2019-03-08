@@ -22,10 +22,10 @@ disp(best_inlier)
 % Transform image 1 using imwarp.
 figure(num_trials + 2);
 transform = affine2d(x');
-I1to2 = imwarp(I1, transform);
-imshow(I2to1);
+default = imwarp(I1, transform);
+imshow(default);
 
 % Transform image 1 using custom warp function.
 figure(num_trials + 3);
-I1to2_bad = bad_warp(I1, x);
-imshow(I1to2_bad);
+custom = bad_warp(I1, x);
+imshow(custom);
