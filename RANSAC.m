@@ -1,4 +1,4 @@
-function [best_x, best_inliers] = RANSAC (inlier_threshold, num_trials, num_matches, I1, I2, k1, k2, matches)
+function [best_x, best_inliers, required_trials] = RANSAC (inlier_threshold, num_trials, num_matches, I1, I2, k1, k2, matches, plot)
 % Find rotation and translation to transform between matching SIFT
 % keypoints.
 % Inputs: 
@@ -9,13 +9,18 @@ function [best_x, best_inliers] = RANSAC (inlier_threshold, num_trials, num_matc
     % k1, k2 are the SIFT keypoints (x, y, scale, orientation) from both
     % images.
     % matches: Matrix with the indexes of the matching keypoints.
+    % plot: Boolean that indicates whether the transformed pairs should be
+    % plotted or not.
 % Outputs: 
     % best_x: Best transformation that was found (most inliers).
     % best_inliers: Number of inliers for the best transformation.
+    % required_trials: Number or trials that were needed to find a good
+    % transformation (>900 inliers).
 
 % Initialize outputs.
 best_x = zeros(3,3);
 best_inliers = -1;
+required_trials = -1;
 
 % Main RANSAC loop.
 for i = 1:num_trials
@@ -48,9 +53,11 @@ for i = 1:num_trials
     x = [x(1) x(2) x(5); x(3) x(4) x(6); 0 0 1];
 
     % Show the two images side by side.
-    figure(i+1);
-    imshow([I1, I2]);
-    hold on;
+    if plot
+        figure(i+1);
+        imshow([I1, I2]);
+        hold on;
+    end
 
     % Find all keypoints for image 1 and 2 that were matched.
     k1_matched = k1(1:2, matches(1, :));
@@ -63,8 +70,10 @@ for i = 1:num_trials
     k1_transformed = x*k1_homogenous;
     k1_transformed = k1_transformed(1:2,:);
 
-     % Plot lines between original and transformed points.
-    plot_pairs(I1, I2, k1_matched, k1_transformed, 1);
+    % Plot lines between original and transformed points.
+    if plot
+        plot_pairs(I1, I2, k1_matched, k1_transformed, 1);
+    end
     
     % Count inliers.
     distance = vecnorm(k1_transformed  - k2_matched);
@@ -72,6 +81,9 @@ for i = 1:num_trials
     
     % Check if this iteration was better than previous attempts.
     if inlier_c > best_inliers
+        if inlier_c > 900 && required_trials < 0
+            required_trials = i;
+        end
         best_x = x;
         best_inliers = inlier_c;
     end
