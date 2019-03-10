@@ -15,24 +15,31 @@ I2_gray = rgb2gray(I2);
 % Find required rotation and translation.
 [x, ~, ~] = RANSAC(inlier_threshold, num_trials, num_matches, I2_gray, I1_gray, k1, k2, matches, false);
 
-[h, w, c] = size(I2)
+% Transform corners of image 2
+[h1,w1,~] = size(I1);
+[h2,w2,~] = size(I2);
+tl = x * [1;1;1];
+tr = x * [w2;1;1];
+bl = x * [1;h2;1];
+br = x * [w2;h2;1];
 
-tl = round(x * [1;1;1])
-tr = round(x * [w;1;1])
-bl = round(x * [1;h;1])
-br = round(x * [w;h;1])
+min_x = floor(min([tr(1),tl(1),bl(1),br(1)]));
+max_x = ceil(max([tr(1),tl(1),bl(1),br(1)]));
+width = max(max_x,w1) - min(min_x,1) + 1;
 
+min_y = floor(min([tr(2),tl(2),bl(2),br(2)]));
+max_y = ceil(max([tr(2),tl(2),bl(2),br(2)]));
+height = max(max_y,h1) - min(min_y,1) + 1;
 
 transform = affine2d(x');
-default = imwarp(I2, transform);
+warped = imwarp(I2, transform);
 
-I = zeros([800 800 3], 'like', I1);
-
-[d_h, d_w, d_c] = size(default);
+I = zeros([height width 3], 'like', I1);
 
 % shift transformed image
-shifted = zeros([round(d_h + x(2,3)), round(d_w + x(1,3)), d_c], 'like', I1);
-shifted(x(2,3):d_h+x(2,3)-1, x(1,3):d_w+x(1,3)-1,:) = default;
+[h,w,c] = size(warped);
+shifted = zeros([height, width, c], 'like', I1);
+shifted(min_y:h+min_y-1, min_x:w+min_x-1,:) = warped;
 
 % create mask for tranformed image
 mask = rgb2gray(shifted);
@@ -48,8 +55,3 @@ I(1:h,1:w,1:c) = I1;
 I(1:h,1:w,1:c) = I(1:h,1:w,1:c) .* cast(~mask, 'like', I);
 [h,w,c] = size(shifted);
 I(1:h,1:w,1:c) = I(1:h,1:w,1:c) + shifted .* cast(mask, 'like', I);
-
-% I = imfuse(I1, shifted, 'blend');
-
-figure(1);
-imshow(I);
