@@ -41,6 +41,8 @@ I = zeros([height width 3], 'like', I1);
 shifted = zeros([height, width, c], 'like', I1);
 shifted(min_y:h+min_y-1, min_x:w+min_x-1,:) = warped;
 
+imwrite(shifted,'right_extended.png');
+
 % create mask for tranformed image
 mask = rgb2gray(shifted);
 mask = mask ~= 0;
@@ -50,8 +52,11 @@ mask = cat(3,mask,mask,mask);
 [h,w,c] = size(I1);
 I(1:h,1:w,1:c) = I1;
 
+imwrite(I,'left_extended.png');
+
 % blend images together with alpha mask
 [h,w,c] = size(mask);
 I(1:h,1:w,1:c) = I(1:h,1:w,1:c) .* cast(~mask, 'like', I);
 [h,w,c] = size(shifted);
 I(1:h,1:w,1:c) = I(1:h,1:w,1:c) + shifted .* cast(mask, 'like', I);
+end
