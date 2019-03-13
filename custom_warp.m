@@ -1,7 +1,7 @@
 function [I_transform] = custom_warp (I, transform)
 % Our own inplementation of imwarp.
 % Inputs: 
-    %I : Image in grayscale to be transformed.
+    %I : Image to be transformed.
     %transform: 3x3 affine transformation matrix.
 % Outputs:
     %I_transform: Tranformed version of I.
