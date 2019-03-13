@@ -31,8 +31,9 @@ min_y = floor(min([tr(2),tl(2),bl(2),br(2)]));
 max_y = ceil(max([tr(2),tl(2),bl(2),br(2)]));
 height = max(max_y,h1) - min(min_y,1) + 1;
 
-transform = affine2d(x');
-warped = imwarp(I2, transform);
+%transform = affine2d(x');
+%warped = imwarp(I2, transform);
+warped = custom_warp(I2, x);
 
 I = zeros([height width 3], 'like', I1);
 
